@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from pydantic import ConfigDict
 
 
 class AssetCreate(BaseModel):
@@ -12,6 +11,6 @@ class AssetResponse(BaseModel):
     vendor: str
     product: str
 
-    model_config = ConfigDict(
-        from_attributes=True
-    )
+    model_config = {
+        "from_attributes": True
+    }

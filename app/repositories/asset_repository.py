@@ -14,7 +14,9 @@ def create_asset(
     )
 
     db.add(asset)
+
     db.commit()
+
     db.refresh(asset)
 
     return asset
@@ -30,14 +32,17 @@ def delete_asset(
     db: Session,
     asset_id: int,
 ) -> bool:
-    asset = db.query(Asset).filter(
-        Asset.id == asset_id
-    ).first()
+    asset = (
+        db.query(Asset)
+        .filter(Asset.id == asset_id)
+        .first()
+    )
 
     if not asset:
         return False
 
     db.delete(asset)
+
     db.commit()
 
     return True
