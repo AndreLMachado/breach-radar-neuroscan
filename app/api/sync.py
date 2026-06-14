@@ -1,5 +1,6 @@
-from fastapi import APIRouter
-from fastapi import Depends
+import httpx
+
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -14,4 +15,11 @@ router = APIRouter(
 def sync_endpoint(
     db: Session = Depends(get_db),
 ):
-    return sync_breaches(db=db)
+    try:
+        return sync_breaches(db=db)
+
+    except httpx.HTTPError:
+        raise HTTPException(
+            status_code=503,
+            detail="HIBP feed unavailable",
+        )
