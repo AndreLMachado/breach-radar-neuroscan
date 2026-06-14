@@ -135,3 +135,68 @@ def test_get_breaches_filtered_by_added_date_range():
 
     for breach in data:
         assert breach["added_date"].startswith("2020")
+
+def test_get_breaches_invalid_page_returns_400():
+    response = client.get(
+        "/breaches",
+        params={
+            "page": 0,
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "page must be greater than or equal to 1"
+    }
+
+
+def test_get_breaches_negative_pwn_count_returns_400():
+    response = client.get(
+        "/breaches",
+        params={
+            "min_pwn_count": -1,
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "min_pwn_count must be greater than or equal to 0"
+    }
+
+def test_get_breaches_pagination():
+    first_page = client.get(
+        "/breaches",
+        params={
+            "page": 1,
+            "page_size": 2,
+        },
+    )
+
+    second_page = client.get(
+        "/breaches",
+        params={
+            "page": 2,
+            "page_size": 2,
+        },
+    )
+
+    assert first_page.status_code == 200
+    assert second_page.status_code == 200
+
+    first_data = first_page.json()
+    second_data = second_page.json()
+
+    assert len(first_data) == 2
+    assert len(second_data) == 2
+
+    assert first_data[0]["name"] != second_data[0]["name"]
+
+def test_get_breaches_invalid_page_size_returns_400():
+    response = client.get(
+        "/breaches",
+        params={
+            "page_size": 0,
+        },
+    )
+
+    assert response.status_code == 400

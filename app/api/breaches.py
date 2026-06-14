@@ -37,6 +37,36 @@ def get_breaches_endpoint(
     is_spam_list: bool | None = None,
     db: Session = Depends(get_db),
 ):
+    if page < 1:
+        raise HTTPException(
+            status_code=400,
+            detail="page must be greater than or equal to 1",
+        )
+
+    if page_size < 1:
+        raise HTTPException(
+            status_code=400,
+            detail="page_size must be greater than or equal to 1",
+        )
+
+    if page_size > 100:
+        raise HTTPException(
+            status_code=400,
+            detail="page_size must be less than or equal to 100",
+        )
+
+    if min_pwn_count is not None and min_pwn_count < 0:
+        raise HTTPException(
+            status_code=400,
+            detail="min_pwn_count must be greater than or equal to 0",
+        )
+
+    if max_pwn_count is not None and max_pwn_count < 0:
+        raise HTTPException(
+            status_code=400,
+            detail="max_pwn_count must be greater than or equal to 0",
+        )
+
     return get_breaches(
         db=db,
         page=page,
