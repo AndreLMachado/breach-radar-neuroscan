@@ -38,6 +38,7 @@ def test_get_breach_by_name_not_found():
         "detail": "Breach not found"
     }
 
+
 def test_get_breaches_filtered_by_domain():
     response = client.get(
         "/breaches",
@@ -51,7 +52,6 @@ def test_get_breaches_filtered_by_domain():
     data = response.json()
 
     assert len(data) > 0
-
     assert "000webhost" in data[0]["domain"]
 
 
@@ -136,6 +136,7 @@ def test_get_breaches_filtered_by_added_date_range():
     for breach in data:
         assert breach["added_date"].startswith("2020")
 
+
 def test_get_breaches_invalid_page_returns_400():
     response = client.get(
         "/breaches",
@@ -162,6 +163,7 @@ def test_get_breaches_negative_pwn_count_returns_400():
     assert response.json() == {
         "detail": "min_pwn_count must be greater than or equal to 0"
     }
+
 
 def test_get_breaches_pagination():
     first_page = client.get(
@@ -191,6 +193,7 @@ def test_get_breaches_pagination():
 
     assert first_data[0]["name"] != second_data[0]["name"]
 
+
 def test_get_breaches_invalid_page_size_returns_400():
     response = client.get(
         "/breaches",
@@ -200,3 +203,38 @@ def test_get_breaches_invalid_page_size_returns_400():
     )
 
     assert response.status_code == 400
+    assert response.json() == {
+        "detail": "page_size must be greater than or equal to 1"
+    }
+
+
+def test_get_breaches_too_large_page_size_returns_400():
+    response = client.get(
+        "/breaches",
+        params={
+            "page_size": 101,
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "page_size must be less than or equal to 100"
+    }
+
+
+def test_get_breach_invalid_slug_returns_400():
+    response = client.get("/breaches/Adobe;")
+
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "Invalid breach name"
+    }
+
+
+def test_get_breach_invalid_slug_with_space_returns_400():
+    response = client.get("/breaches/Adobe Test")
+
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "Invalid breach name"
+    }

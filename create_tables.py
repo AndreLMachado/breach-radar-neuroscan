@@ -1,7 +1,7 @@
-from app.database import Base, engine
+from app.database import Base
+from app.database import engine
+from app import models  # noqa: F401
 
-# Importa os models para registrar as tabelas
-from app.models import Asset, Vulnerability, SyncAudit
 
 Base.metadata.create_all(bind=engine)
 

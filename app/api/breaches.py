@@ -11,6 +11,8 @@ from app.repositories import get_breach_by_name
 from app.repositories import get_breaches
 from app.schemas import BreachResponse
 
+from legacy.breach_matcher import is_valid_breach_name
+
 router = APIRouter(
     prefix="/breaches",
     tags=["breaches"],
@@ -93,6 +95,12 @@ def get_breach_detail_endpoint(
     name: str,
     db: Session = Depends(get_db),
 ):
+    if not is_valid_breach_name(name):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid breach name",
+        )
+
     breach = get_breach_by_name(
         db=db,
         name=name,
