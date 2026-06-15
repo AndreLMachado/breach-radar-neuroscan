@@ -238,3 +238,30 @@ def test_get_breach_invalid_slug_with_space_returns_400():
     assert response.json() == {
         "detail": "Invalid breach name"
     }
+
+def test_get_breaches_combined_filters():
+    response = client.get(
+        "/breaches",
+        params={
+            "data_class": "passwords",
+            "min_pwn_count": 10000000,
+            "is_verified": True,
+            "page_size": 5,
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert len(data) > 0
+
+    for breach in data:
+        data_classes = [
+            item.lower()
+            for item in breach["data_classes"]
+        ]
+
+        assert "passwords" in data_classes
+        assert breach["pwn_count"] >= 10000000
+        assert breach["is_verified"] is True

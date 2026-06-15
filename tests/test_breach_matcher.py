@@ -34,3 +34,5 @@ def test_paginate_returns_full_page_size():
         page=1,
         page_size=2,
     ) == [1, 2]
+
+
